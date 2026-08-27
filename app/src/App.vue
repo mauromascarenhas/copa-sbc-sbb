@@ -101,11 +101,18 @@ async function submitForm(){
   if (!playModes.mixedDouble) delete subData.mixedDoublePartner;
 
   try{
-    const res = await fetch("https://test.com", {
-      method: "POST",
-      body: JSON.stringify(subData)
-    })
+    const res = await fetch(
+      "https://script.google.com/macros/s/AKfycbytVQxdWk0loaeOenP9ZroGO5HSxfR9FcDTwqv0quJJLJn8FdQhuc9HaKo4ptFeAmg/exec",
+      {
+        method: "POST",
+        body: JSON.stringify(subData)
+      }
+    );
     if (!res.ok) throw new Error("Submission error");
+
+    const resp = await res.json();
+    if (resp.status === "error") throw new Error("Submission error");
+
     formSubmissionState.value = FORM_SUB_STATE.SUCCESS;
 
     await nextTick();
@@ -150,7 +157,66 @@ async function submitForm(){
             <h1>Formulário de inscrição | Copa São Bernardo de Badminton 2026</h1>
           </div>
 
-          <form v-if="formSubmissionState === FORM_SUB_STATE.EDIT">
+          <form v-if="formSubmissionState === FORM_SUB_STATE.EDIT" @submit.prevent="submitForm">
+            <div class="mb-4">
+              <div>
+                <div>
+                  <b>Data:</b> 26 e 27 de setembro de 2026 (inscrições até 12/09/2026).
+                </div>
+                <div>
+                  <ul>
+                    <li>Dia 26: Sêniors, Veteranos e Masters;</li>
+                    <li>Dia 27: Jovens e Aberta.</li>
+                  </ul>
+                </div>
+              </div>
+              <div>
+                <b>Local:</b> Av. Presidente Arthur Bernardes, 55, Rudge Ramos - São Bernardo do Campo - SP.
+              </div>
+              <div class="mt-2">
+                <div class="mb-2">
+                  <b>Valores por modalidade:</b>
+                </div>
+                <div>
+                  <ul>
+                    <li>Simpres: R$ 70,00;</li>
+                    <li>Duplas: R$ 70,00 (deverá ser dividido em R$35,00 por integrante).</li>
+                  </ul>
+                </div>
+                <div>
+                  O pagamento deverá ser realizado para a chave PIX do SBB (CNPJ): <b>30.380.122/0001-11</b> e o comprovante
+                  enviado para o e-mail <a href="mailto:sbb@terra.com.br">sbb@terra.com.br</a>.
+                </div>
+              </div>
+              <div class="text-center my-5">
+                <div class="h5">
+                  Gostaria de mais detalhes?
+                </div>
+                <div class="d-flex justify-content-center">
+                  <a
+                    class="btn btn-primary mx-2" target="_blank"
+                    href="https://github.com/mauromascarenhas/copa-sbc-sbb/raw/refs/heads/main/misc/2026/Carta Convite - Copa São Bernardo de Badminton 2026.pdf"
+                  >
+                    <i class="bi bi-file-earmark-pdf"></i> Visualizar Carta Convite
+                  </a>
+                  <a
+                    class="btn btn-primary mx-2" target="_blank"
+                    href="https://wa.me/+5511977399090"
+                  >
+                    <i class="bi bi-whatsapp"></i> Falar com Fátima (WhatsApp)
+                  </a>
+                </div>
+                <div class="text-center mt-3">
+                  <a
+                    class="btn btn-primary mx-2" target="_blank"
+                    href="https://github.com/mauromascarenhas/copa-sbc-sbb/raw/refs/heads/main/misc/2026/Ficha%20de%20Inscri%C3%A7%C3%B5es%20-%20Copa%20S%C3%A3o%20Bernardo%202026.xls"
+                  >
+                    <i class="bi bi-file-earmark-excel"></i> Baixar planilha para inscrição em lote (Excel)
+                  </a>
+                </div>
+              </div>
+            </div>
+
             <div class="mb-3">
               <label for="name" class="form-label">Nome completo</label>
               <div class="input-group">
@@ -350,7 +416,7 @@ async function submitForm(){
               </div>
             </template>
 
-            <div class="alert alert-warning" role="alert">
+            <div v-if="submissionError" class="alert alert-warning" role="alert">
               Falha ao submeter formulário. Por favor, verifique as informações preenchidas e tente novamente.
             </div>
 
@@ -363,17 +429,18 @@ async function submitForm(){
               <div class="my-4">
                 <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;"></div>
               </div>
-              <p role="status">Submetendo formulário...</p>
+              <p class="my-4 fs-3" role="status">Submetendo formulário...</p>
             </div>
           </div>
 
-          <div v-else>
-              <div>
-
+          <div v-else class="text-center">
+              <div class="text-success" style="font-size: 7.5rem;">
+                <i class="bi bi-check-circle-fill"></i>
               </div>
-              <p>Formulário submetido com sucesso!</p>
-              <p>Não se esqueça de enviar o comprovante de pagamento para <a href="mailto:sbb@terra.com">sbb@terra.com</a>!</p>
-              <p>Desejamos uma boa copa para você! Estamos te esperando!</p>
+
+              <p class="fs-5">Formulário submetido com sucesso!</p>
+              <p class="fs-5">Não se esqueça de enviar o comprovante de pagamento para <a href="mailto:sbb@terra.com">sbb@terra.com</a>!</p>
+              <p class="fs-5">Estamos te esperando!</p>
           </div>
         </div>
         <div class="d-none d-md-block col-12 col-md-3"></div>
@@ -389,10 +456,6 @@ async function submitForm(){
 
 <style lang="scss">
 $primary: #263089;
-
-$theme-colors: (
-  primary: $primary
-);
 
 @import "bootstrap";
 @import "bootstrap-icons/font/bootstrap-icons.css";
