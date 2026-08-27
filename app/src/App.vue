@@ -379,7 +379,7 @@ async function submitForm(){
                 </div>
               </div>
 
-              <div class="mt-3 mb-3" v-if="playModes.double && !!formData.mixedDoublePartner.category">
+              <div class="mt-3 mb-3" v-if="playModes.mixedDouble && !!formData.mixedDoublePartner.category">
                 <label for="doubleMixModeAlt" class="form-label">Aceita ser realocado para outra categoria, caso necessário?</label>
                 <div class="input-group">
                   <span class="input-group-text" aria-hidden="true"><i class="bi bi-alt"></i></span>
