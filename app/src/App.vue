@@ -36,20 +36,17 @@ function buildFormData(){
     club: "",
     gender: "" as "M" | "F",
     singleModeCategory: "",
-    singleModeAltCategory: "",
     doublePartner: {
       name: "",
-      birthYear: 1900 as number,
+      birthYear: null as number | null,
       club: "",
-      category: "",
-      altCategory: ""
+      category: ""
     },
     mixedDoublePartner: {
       name: "",
-      birthYear: 1900 as number,
+      birthYear: null as number | null,
       club: "",
-      category: "",
-      altCategory: ""
+      category: ""
     }
   };
 }
@@ -57,10 +54,7 @@ function buildFormData(){
 const formData = ref(buildFormData());
 watch(() => formData.value.gender, (nv, ov) => {
   formData.value.singleModeCategory = formData.value.singleModeCategory.replace(ov, nv);
-  formData.value.singleModeAltCategory = formData.value.singleModeAltCategory.replace(ov, nv);
-
   formData.value.doublePartner.category = formData.value.doublePartner.category.replace(ov, nv);
-  formData.value.doublePartner.altCategory = formData.value.doublePartner.altCategory.replace(ov, nv);
 });
 
 const playModes = reactive({
@@ -93,16 +87,13 @@ async function submitForm(){
   });
 
   const subData = { ...formData.value } as Partial<typeof formData.value>
-  if (!playModes.single){
-    delete subData.singleModeCategory;
-    delete subData.singleModeAltCategory;
-  }
+  if (!playModes.single) delete subData.singleModeCategory;
   if (!playModes.double) delete subData.doublePartner;
   if (!playModes.mixedDouble) delete subData.mixedDoublePartner;
 
   try{
     const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbzdb5AszYJPjtU24GkbXu_VFBy9vWjEwt2B_LNb96io7qPvKFtHx4jCwHoH8NbrbeIN/exec",
+      "https://script.google.com/macros/s/AKfycbwhoxwVsf_J0cpEV4fhsPyHfAJUrPH2pZ2QPAeJc5D1Rf_JcYRwIuQHuXJ0D-szuDJD/exec",
       {
         method: "POST",
         body: JSON.stringify(subData)
@@ -138,11 +129,13 @@ async function submitForm(){
   <header>
     <nav class="navbar bg-primary">
       <div class="container-fluid">
-        <a class="navbar-brand text-bg-primary mx-auto" href="#">
+        <a class="navbar-brand text-bg-primary mx-auto d-flex flex-row align-items-center" href="#">
           <img src="@/assets/logo_sbb.png" alt="Logotipo SBB"
             class="logo d-inline-block align-text-top me-3"
           >
-          Copa São Bernardo de Badminton 2026
+          <div class="text-wrap">
+            Copa São Bernardo de Badminton 2026
+          </div>
         </a>
       </div>
     </nav>
@@ -190,6 +183,24 @@ async function submitForm(){
               </div>
               <div class="text-center my-5">
                 <div class="h5">
+                  Inscrição em  lote
+                </div>
+                <div>
+                  Para realizar a inscrição de vários atletas simultaneamente, basta baixar a seguinte planilha
+                  e enviá-la devidamente prenchida junto ao comprovante de pagamento para o e-mail
+                  <a href="mailto:sbb@terra.com.br">sbb@terra.com.br</a>.
+                </div>
+                <div class="text-center mt-3">
+                  <a
+                    class="btn btn-primary mx-2" target="_blank"
+                    href="https://github.com/mauromascarenhas/copa-sbc-sbb/raw/refs/heads/main/misc/2026/Ficha%20de%20Inscri%C3%A7%C3%B5es%20-%20Copa%20S%C3%A3o%20Bernardo%202026.xls"
+                  >
+                    <i class="bi bi-file-earmark-excel"></i> Baixar planilha para inscrição em lote (Excel)
+                  </a>
+                </div>
+              </div>
+              <div class="text-center my-5">
+                <div class="h5">
                   Gostaria de mais detalhes?
                 </div>
                 <div class="d-flex justify-content-center">
@@ -204,14 +215,6 @@ async function submitForm(){
                     href="https://wa.me/+5511977399090"
                   >
                     <i class="bi bi-whatsapp"></i> Falar com Fátima (WhatsApp)
-                  </a>
-                </div>
-                <div class="text-center mt-3">
-                  <a
-                    class="btn btn-primary mx-2" target="_blank"
-                    href="https://github.com/mauromascarenhas/copa-sbc-sbb/raw/refs/heads/main/misc/2026/Ficha%20de%20Inscri%C3%A7%C3%B5es%20-%20Copa%20S%C3%A3o%20Bernardo%202026.xls"
-                  >
-                    <i class="bi bi-file-earmark-excel"></i> Baixar planilha para inscrição em lote (Excel)
                   </a>
                 </div>
               </div>
@@ -294,20 +297,6 @@ async function submitForm(){
                   </select>
                 </div>
               </div>
-
-              <div class="mt-3 mb-3" v-if="playModes.single && !!formData.singleModeCategory">
-                <label for="singleModeAlt" class="form-label">Aceita ser realocado para outra categoria, caso necessário?</label>
-                <div class="input-group">
-                  <span class="input-group-text" aria-hidden="true"><i class="bi bi-alt"></i></span>
-                  <select v-model="formData.singleModeAltCategory" class="form-select" name="singleModeAlt" required>
-                    <option value="" selected disabled>Selecionar...</option>
-                    <option value="-">Não</option>
-                    <option v-for="v, k in BASE_CATEGORIES_MAP" :key="k" :value="'S' + formData.gender + k">
-                      Sim, até a {{ `S${formData.gender}${k} - ${GAME_TYPE_MAP.S} ${GENDER_MAP[formData.gender]} ${v}` }}
-                    </option>
-                  </select>
-                </div>
-              </div>
             </template>
 
             <template v-if="playModes.double">
@@ -321,20 +310,6 @@ async function submitForm(){
                     <option value="" selected disabled>Selecionar...</option>
                     <option v-for="v, k in BASE_CATEGORIES_MAP" :key="k" :value="'D' + formData.gender + k">
                       {{ `D${formData.gender}${k} - ${GAME_TYPE_MAP.D} ${GENDER_MAP[formData.gender]} ${v}` }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="mt-3 mb-3" v-if="playModes.double && !!formData.doublePartner.category">
-                <label for="doubleModeAlt" class="form-label">Aceita ser realocado para outra categoria, caso necessário?</label>
-                <div class="input-group">
-                  <span class="input-group-text" aria-hidden="true"><i class="bi bi-alt"></i></span>
-                  <select v-model="formData.doublePartner.altCategory" class="form-select" name="doubleModeAlt" required>
-                    <option value="" selected disabled>Selecionar...</option>
-                    <option value="-">Não</option>
-                    <option v-for="v, k in BASE_CATEGORIES_MAP" :key="k" :value="'D' + formData.gender + k">
-                      Sim, até a {{ `D${formData.gender}${k} - ${GAME_TYPE_MAP.S} ${GENDER_MAP[formData.gender]} ${v}` }}
                     </option>
                   </select>
                 </div>
@@ -372,20 +347,6 @@ async function submitForm(){
                   <span class="input-group-text" aria-hidden="true"><i class="bi bi-people-fill"></i></span>
                   <select v-model="formData.mixedDoublePartner.category" class="form-select" name="doubleMixMode" required>
                     <option value="" selected disabled>Selecionar...</option>
-                    <option v-for="v, k in BASE_CATEGORIES_MAP" :key="k" :value="'DX' + k">
-                      {{ `DX${k} - ${GAME_TYPE_MAP.D} Mista ${v}` }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="mt-3 mb-3" v-if="playModes.mixedDouble && !!formData.mixedDoublePartner.category">
-                <label for="doubleMixModeAlt" class="form-label">Aceita ser realocado para outra categoria, caso necessário?</label>
-                <div class="input-group">
-                  <span class="input-group-text" aria-hidden="true"><i class="bi bi-alt"></i></span>
-                  <select v-model="formData.mixedDoublePartner.altCategory" class="form-select" name="doubleMixModeAlt" required>
-                    <option value="" selected disabled>Selecionar...</option>
-                    <option value="-">Não</option>
                     <option v-for="v, k in BASE_CATEGORIES_MAP" :key="k" :value="'DX' + k">
                       {{ `DX${k} - ${GAME_TYPE_MAP.D} Mista ${v}` }}
                     </option>
@@ -462,7 +423,7 @@ $primary: #263089;
 
 .logo {
   width: 2rem;
-  height: auto;
+  height: 2rem;
 }
 
 main {
