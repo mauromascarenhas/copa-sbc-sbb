@@ -93,7 +93,7 @@ async function submitForm(){
 
   try{
     const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbwhoxwVsf_J0cpEV4fhsPyHfAJUrPH2pZ2QPAeJc5D1Rf_JcYRwIuQHuXJ0D-szuDJD/exec",
+      "https://script.google.com/macros/s/AKfycbz-8tLTygWEzBuqVFSg-d8KSCB1VkOJ2O0KIQ1HbrSmFnPv3Qn-EJh5W13emCiVJ66S/exec",
       {
         method: "POST",
         body: JSON.stringify(subData)
